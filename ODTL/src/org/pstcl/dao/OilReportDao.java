@@ -6,6 +6,7 @@ import org.pstcl.model.ODTLFilterModel;
 import org.pstcl.model.OilReportFilterModel;
 import org.pstcl.model.entity.OilReport;
 import org.pstcl.model.entity.User;
+import org.pstcl.model.transformer.entity.OilReportEntityModel;
 
 
 
@@ -32,6 +33,10 @@ public interface OilReportDao {
 
 	List<OilReport> findAllOilReports(OilReportFilterModel filterModel);
 
+
+
+
+	List<OilReportEntityModel> findAllOilReportEntityModelList(OilReportFilterModel filterModel);
+
 	
 }
-

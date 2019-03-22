@@ -32,6 +32,8 @@ public class OilReport extends ODTLEntityMaster {
 //	}
 
 
+	//approvalAEE approvalASE reportDate oilSample equipment id
+
 
 	@Column
 	private String ageingCharacteristicsSpecificResistanceAt90Degree;

@@ -9,6 +9,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.pstcl.dao.AbstractDao;
 import org.pstcl.dao.OilReportDao;
 import org.pstcl.model.FilterModel;
@@ -17,6 +18,7 @@ import org.pstcl.model.entity.Equipment;
 import org.pstcl.model.entity.OilReport;
 import org.pstcl.model.entity.OilSample;
 import org.pstcl.model.entity.User;
+import org.pstcl.model.transformer.entity.OilReportEntityModel;
 import org.pstcl.util.ODTLDateUtil;
 import org.pstcl.util.StringUtil;
 import org.slf4j.Logger;
@@ -122,6 +124,8 @@ public class OilReportDaoImpl extends AbstractDao<Integer, OilReport> implements
 
 
 
+
+	@Deprecated
 	@Override
 	public List<OilReport> findAllOilReports(OilReportFilterModel filterModel) {
 		Criteria crit =  createEntityCriteria();
@@ -223,6 +227,113 @@ public class OilReportDaoImpl extends AbstractDao<Integer, OilReport> implements
 
 		List<OilReport> list=(List<OilReport>) crit.list();
 		return list;
+	}
+
+
+	@Override
+	public List<OilReportEntityModel> findAllOilReportEntityModelList(OilReportFilterModel filterModel) {
+		Criteria crit =  createEntityCriteria();
+
+
+		if(null!=filterModel.getOilSample())
+		{
+			if(null!=filterModel.getOilSample().getId())
+			{
+				crit.add(Restrictions.eq("oilSample.id", filterModel.getOilSample().getId()));
+			}
+		}
+		if(filterModel.getFinalReport())
+		{
+			crit.add(Restrictions.eq("approvalASE", StringUtil.APPROVED));
+		}
+
+		else if(filterModel.getRejectedReport())
+		{
+
+			Criterion rest1= Restrictions.eq("approvalAEE", StringUtil.REJECTED);
+			Criterion rest2= Restrictions.eq("approvalASE", StringUtil.REJECTED);
+			crit.add(Restrictions.or(rest1, rest2));
+
+		}
+
+		else if(filterModel.getAeeApproval())
+		{
+			crit.add(Restrictions.eq("approvalAEE",StringUtil.APPROVED ));
+			crit.add(Restrictions.ne("approvalASE", StringUtil.APPROVED));
+		}
+
+		else if(!filterModel.getFinalReport()&&!filterModel.getAeeApproval()&&!filterModel.getRejectedReport())
+		{
+			Criterion rest3= Restrictions.eq("approvalAEE", StringUtil.DECISION_PENDING);
+			Criterion rest4= Restrictions.eq("approvalASE", StringUtil.DECISION_PENDING);
+			crit.add(Restrictions.or(rest3, rest4));
+		}
+
+
+
+
+		//crit.addOrder(Order.desc("sampleNo"));
+
+
+		
+		//		crit.setProjection(
+		//				Projections.projectionList()
+		//				.add(Projections.property("equipment"), "equipment")
+		//				.add(Projections.property("oilSample"), "oilSample")
+		//				.add(Projections.property("sampleNo"), "sampleNo")
+		//				.add(Projections.property("reportDate"), "reportDate")
+		//				.add(Projections.property("approvalAEE"), "approvalAEE")
+		//				.add(Projections.property("approvalASE"), "approvalASE")
+		//				.add(Projections.property("id"), "id")
+		//				)
+		//		.setResultTransformer(Transformers.aliasToBean(OilReport.class));
+
+		if(!(null==filterModel.getSelectedCircle()&&null==filterModel.getSelectedDivision()&&null==filterModel.getSelectedSubstation()))
+		{
+
+
+			List <Integer> ids=getCriteriaEquipmentIds(filterModel);
+
+			if(ids!=null){
+				if(ids.size()>0)
+				{
+					crit.add(Restrictions.in("equipment.id", ids));
+				}
+				else
+				{
+					crit.add(Restrictions.sqlRestriction("(1=0)"));
+				}
+			}
+
+		}
+		List <Integer> sampleIds=getCriteriaOilSampleIds(filterModel);
+
+		if(sampleIds!=null){
+			if(sampleIds.size()>0)
+			{
+				crit.add(Restrictions.in("oilSample.id", sampleIds));
+			}
+			else
+			{
+				crit.add(Restrictions.sqlRestriction("(1=0)"));
+			}
+		}
+
+		crit.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
+		//List<OilReportEntityModel> results = crit.setResultTransformer(Transformers.aliasToBean(OilReportEntityModel.class)).list();
+		//	List<OilReport> list=(List<OilReport>) crit.list();
+		
+		List<OilReportEntityModel> results =crit.setProjection(Projections.projectionList()
+				.add(Projections.property("id"), "id")
+				.add(Projections.property("approvalAEE"), "approvalAEE")
+				.add(Projections.property("approvalASE"), "approvalASE")
+				.add(Projections.property("oilSample"), "oilSample")
+				.add(Projections.property("equipment"), "equipment")
+				.add(Projections.property("reportDate"), "reportDate"))
+		.setResultTransformer(Transformers.aliasToBean(OilReport.class)).list();
+
+		return results;
 	}
 
 

@@ -20,6 +20,7 @@ import org.pstcl.model.entity.OilSample;
 import org.pstcl.model.entity.ReportFile;
 import org.pstcl.model.entity.Substation;
 import org.pstcl.model.entity.User;
+import org.pstcl.model.transformer.entity.OilReportEntityModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -89,7 +90,7 @@ public class RestService extends ODTLServiceUtil {
 	public List<OilSample> findAllOilSamples(OilSampleFilterModel oilSampleFilterModel) {
 
 		//return oilSampleDao.findAllOilSamples(oilSampleFilterModel);
-		
+
 		User user=getLoggedInUser();
 		List<OilSample> oilSamples;
 		if(userService.hasRole("ODTL"))
@@ -100,11 +101,11 @@ public class RestService extends ODTLServiceUtil {
 		{
 
 			oilSamples=oilSampleDao.findAllOilSamples(oilSampleFilterModel);
-		
+
 		}
 		else
 		{
-			
+
 			if(userService.hasRole("GRID"))
 			{
 				oilSampleFilterModel.setFreshOilReport(true);
@@ -120,20 +121,23 @@ public class RestService extends ODTLServiceUtil {
 					oilSampleFilterModel.setSelectedSubstation(user.getSubstation());
 				}
 			}
-			
-			
+
+
 			oilSamples=oilSampleDao.findAllOilSamples(oilSampleFilterModel);
 		}
 		return oilSamples;
 
-		
-		
+
+
 	}
 
+
+	//Deprecated in favor of method below that returns a subset of OilReport for viewing report details without parameters in OilReportEntityModel List
+	@Deprecated
 	public List<OilReport> findAllOilReports(OilReportFilterModel oilReportFilterModel) {
 		List<OilReport> oilreports;
 		User user=getLoggedInUser();
-		
+
 		if(userService.hasRole("ODTL"))
 		{
 			if(userService.hasRole("ASE"))
@@ -146,14 +150,14 @@ public class RestService extends ODTLServiceUtil {
 		{
 			oilReportFilterModel.setFinalReport(true);
 			oilreports=oilReportDao.findAllOilReports(oilReportFilterModel);
-				
+
 		}
 		else
 		{
 			oilReportFilterModel.setFinalReport(true);
 			if(userService.hasRole("GRID"))
 			{
-				
+
 				oilReportFilterModel.setGridReport(true);
 			}
 			else
@@ -162,19 +166,66 @@ public class RestService extends ODTLServiceUtil {
 				oilReportFilterModel.setReportYear(null);
 				if(userService.hasRole("ASE"))
 				{
-				oilReportFilterModel.setSelectedDivision(user.getDivision());
+					oilReportFilterModel.setSelectedDivision(user.getDivision());
 				}
 				else
 				{
 					oilReportFilterModel.setSelectedSubstation(user.getSubstation());
 				}
 			}
-			
-			
+
+
 			oilreports=oilReportDao.findAllOilReports(oilReportFilterModel);
 		}
 		return oilreports;
 	}
+
+
+	public List<OilReportEntityModel> findAllOilReportEntityModelList(OilReportFilterModel oilReportFilterModel) {
+		List<OilReportEntityModel> oilreports;
+		User user=getLoggedInUser();
+
+		if(userService.hasRole("ODTL"))
+		{
+			if(userService.hasRole("ASE"))
+			{
+				oilReportFilterModel.setAeeApproval(true);
+			}
+		}
+		else if(userService.hasRole("MGMT"))
+		{
+			oilReportFilterModel.setFinalReport(true);
+
+		}
+		else
+		{
+			oilReportFilterModel.setFinalReport(true);
+			if(userService.hasRole("GRID"))
+			{
+
+				oilReportFilterModel.setGridReport(true);
+			}
+			else
+			{
+				oilReportFilterModel.setReportMonth(null);
+				oilReportFilterModel.setReportYear(null);
+				if(userService.hasRole("ASE"))
+				{
+					oilReportFilterModel.setSelectedDivision(user.getDivision());
+				}
+				else
+				{
+					oilReportFilterModel.setSelectedSubstation(user.getSubstation());
+				}
+			}
+
+		}
+
+		oilreports=oilReportDao.findAllOilReportEntityModelList(oilReportFilterModel);
+
+		return oilreports;
+	}
+
 
 	public List<ReportFile> getPDFFiles(Integer start, Integer end) {
 		List<ReportFile> files= reportFileDao.findAllReportFiles(start,end);

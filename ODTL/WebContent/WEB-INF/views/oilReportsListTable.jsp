@@ -28,6 +28,7 @@
 						class="table table-striped table-bordered table-hover">
 						<thead class="thead-light">
 							<tr>
+								<th scope="col">#</th>
 
 								<th scope="col">#</th>
 
@@ -59,14 +60,16 @@
 								<c:choose>
 									<c:when test="${oilReport.approvalAEE eq -100}">
 										<tr class="table-warning">
-
+											<td>${indexStatus.index + 1 }</td>
 											<td><span> <i class="fa fa-warning"
 													style="font-size: 18px; color: orange;"> Rejected by
 														AEE</i>
 											</span></td>
 									</c:when>
+
 									<c:when test="${oilReport.approvalASE eq -100}">
 										<tr class="table-danger">
+											<td>${indexStatus.index + 1 }</td>
 
 											<td><span> <i class="fa fa-warning"
 													style="font-size: 18px; color: red"> Rejected by ASE</i>
@@ -74,17 +77,18 @@
 									</c:when>
 									<c:otherwise>
 										<tr>
+											<td>${indexStatus.index + 1 }</td>
 
 											<td><c:choose>
 													<c:when test="${oilReport.approvalASE eq 100}">
 														<span> <i class="fa fa-warning"
-															style="font-size: 18px; color: Blue">Published</i>
+															style="font-size: 18px; color: Green">Published</i>
 														</span>
 													</c:when>
 
 													<c:when test="${oilReport.approvalAEE eq 100}">
 														<span> <i class="fa fa-warning"
-															style="font-size: 18px; color: Green">(1) Approvals
+															style="font-size: 18px; color: Light-Green">(1) Approvals
 																Pending: ASE</i>
 														</span>
 													</c:when>
@@ -99,6 +103,9 @@
 												</c:choose></td>
 									</c:otherwise>
 								</c:choose>
+
+
+
 								<td>${oilReport.oilSample.sampleNo}</td>
 								<td><fmt:formatDate
 										value="${oilReport.oilSample.sampleReceiptDate}"
@@ -126,9 +133,9 @@
 											<sec:authorize access="hasRole('ODTL')">
 												<sec:authorize access="hasRole('AEE')">
 													<c:if test="${oilReport.approvalAEE eq -10}">
-													<a class="nav-link"
-														href="<c:url value='/aeeRemarksOilReport${oilReport.id}' />">
-														Approve/Reject</a>
+														<a class="nav-link"
+															href="<c:url value='/aeeRemarksOilReport${oilReport.id}' />">
+															Approve/Reject</a>
 													</c:if>
 												</sec:authorize>
 

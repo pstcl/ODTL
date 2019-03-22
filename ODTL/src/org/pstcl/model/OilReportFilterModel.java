@@ -46,6 +46,9 @@ public class OilReportFilterModel  extends FilterModel{
 		this.reportMonth = reportMonth;
 		this.reportYear=reportYear;
 		
+		
+		
+		
 	}
 
 

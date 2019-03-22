@@ -24,6 +24,7 @@ import org.pstcl.model.entity.Circle;
 import org.pstcl.model.entity.Division;
 import org.pstcl.model.entity.ReportFile;
 import org.pstcl.model.entity.Substation;
+import org.pstcl.model.transformer.entity.OilReportEntityModel;
 import org.pstcl.service.RestService;
 import org.pstcl.service.UserService;
 import org.pstcl.util.StringUtil;
@@ -36,6 +37,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StreamUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -69,9 +71,9 @@ public class RestController {
 		return "oilReportsListNew";
 	}
 
-	
-	
-	
+
+
+
 	@PreAuthorize("hasRole('ADMIN')")
 	@RequestMapping(value = {"/listOilReport","/listOilReportNew" }, method = RequestMethod.GET)
 	public String listOilReport(ModelMap model) {
@@ -134,8 +136,8 @@ public class RestController {
 	public String listOilSampleNew(ModelMap model) {
 		return "oilSampleListNew";
 	}
-	
-	
+
+
 	@PreAuthorize("hasRole('ADMIN')")
 	@RequestMapping(value = {"/filterEquipment" }, method = RequestMethod.POST)
 	public ModelAndView filterEquipmentsNew(
@@ -152,7 +154,7 @@ public class RestController {
 		EquipmentFilterModel equipmentFilterModel=new EquipmentFilterModel(circle, div, substation, capacity, serialNo,equipmentID, make);
 		model.addAttribute("equipments", restService.getEquipmentsList(equipmentFilterModel));
 		model.addAttribute("loggedinuser", restService.getLoggedInUser());
-		
+
 		return new ModelAndView("equipmentTable", model) ;
 	}
 
@@ -173,12 +175,12 @@ public class RestController {
 			@RequestParam(value="sampleNo")Integer sampleNo, 
 			@RequestParam(value="referenceMemoDate")String referenceMemoDate, 
 			@RequestParam(value="referenceMemoNo")String referenceMemoNo,
-	
+
 			@RequestParam(value="pendingSamples")Boolean pendingSamples,
 			@RequestParam(value="month")Integer month,
 			@RequestParam(value="year")Integer year,
 			ModelMap model) 
-	
+
 	{
 		DateFormat dateFormat=new SimpleDateFormat("dd/MM/YYYY");
 
@@ -190,35 +192,47 @@ public class RestController {
 		return new ModelAndView("oilSamplesTable", model) ;
 	}
 
-
+//Conversion of Circle,Division and Substation id to object not working when filter object is sent as json object
+	
+//	@PreAuthorize("hasRole('ADMIN')")
+//	@RequestMapping(value = {"/filterOilReport2" },consumes= {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.POST)
+//	public ModelAndView filterOilReport2(
+//			@RequestBody OilReportFilterModel oilReportFilterModel,ModelMap model) 
+//	{
+//
+//		//return restService.findAllOilReportEntityModelList(oilReportFilterModel);
+//		//OilReportFilterModel oilReportFilterModel=new OilReportFilterModel(circle, div, substation,sampleNo,reportDateStart,reportDateEnd,month,year,finalReport,aeeApproval,rejectedReport);
+//				model.addAttribute("oilReports", restService.findAllOilReportEntityModelList(oilReportFilterModel));
+//				model.addAttribute("loggedinuser", restService.getLoggedInUser());
+//		
+//				return new ModelAndView("oilReportsListTable", model) ;
+//	}
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@RequestMapping(value = {"/filterOilReport" }, method = RequestMethod.POST)
 	public ModelAndView filterOilReport(
-			@RequestParam(value="circleSelected") Circle circle,
-			@RequestParam(value="divisionSelected") Division div,
-			@RequestParam(value="substationSelected") Substation substation,
-
-
+			@RequestParam(value="selectedCircle") Circle circle,
+			@RequestParam(value="selectedDivision") Division div,
+			@RequestParam(value="selectedSubstation") Substation substation,
 			@RequestParam(value="sampleNo")Integer sampleNo, 
-			@RequestParam(value="reportDateStart")String reportDateStart,
-			@RequestParam(value="reportDateEnd")String reportDateEnd,
-			@RequestParam(value="month")Integer month,
-			@RequestParam(value="year")Integer year,
+			@RequestParam(value="startDate")String reportDateStart,
+			@RequestParam(value="endDate")String reportDateEnd,
+			@RequestParam(value="reportMonth")Integer month,
+			@RequestParam(value="reportYear")Integer year,
 			@RequestParam(value="finalReport")Boolean finalReport,
 			@RequestParam(value="aeeApproval")Boolean aeeApproval,
 			@RequestParam(value="rejectedReport")Boolean rejectedReport,
 			ModelMap model) 
 	{
 		OilReportFilterModel oilReportFilterModel=new OilReportFilterModel(circle, div, substation,sampleNo,reportDateStart,reportDateEnd,month,year,finalReport,aeeApproval,rejectedReport);
-		model.addAttribute("oilReports", restService.findAllOilReports(oilReportFilterModel));
+		model.addAttribute("oilReports", restService.findAllOilReportEntityModelList(oilReportFilterModel));
 		model.addAttribute("loggedinuser", restService.getLoggedInUser());
 
 		return new ModelAndView("oilReportsListTable", model) ;
 	}
 
 	@RequestMapping(value = "/getLocationsModel", method = RequestMethod.POST,produces = "application/json")
-	public @ResponseBody FilterModel getEmployee(@RequestParam(value="circleSelected") String circleCode,@RequestParam(value="divisionSelected") String divCode,@RequestParam(value="substationSelected") String substationCode,ModelMap model) {
+	public @ResponseBody FilterModel getLocationsModel(@RequestParam(value="circleSelected") String circleCode,@RequestParam(value="divisionSelected") String divCode,@RequestParam(value="substationSelected") String substationCode,ModelMap model) {
 		FilterModel locationModel= restService.getLocationModel(circleCode,divCode,substationCode);
 
 		return locationModel;

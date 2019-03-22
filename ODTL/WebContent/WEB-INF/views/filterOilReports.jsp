@@ -35,12 +35,12 @@
 <!-- </script> -->
 <script type="text/javascript">
 	function applyFilters() {
-		
+
 		showProgressBar();
-		
+
 		$('#tableContainer').css('display', 'none');
 		$('#loader').css('display', 'block');
-		
+
 		var circleSelected = $("#circleDD").val();
 		var divisionSelected = $("#divisionDD").val();
 		var substationSelected = $("#substationDD").val();
@@ -49,14 +49,19 @@
 		if ($("#reportDate").val() == "") {
 			var newdate = new Date();
 			newdate.setDate(new Date().getDate() - 15); // minus the date
-			document.getElementById("reportDate").value = newdate.getFullYear()
-					+ "-" + ("0" + (newdate.getMonth() + 1)).slice(-2);
+			document.getElementById("reportDate").value = newdate.getFullYear()	+ "-" + ("0" + (newdate.getMonth() + 1)).slice(-2);
 		}
 
-		var reportDateArray = $("#reportDate").val().split("-");
+		if ($("#reportDate").val() != "") {
+			var reportDateArray = $("#reportDate").val().split("-");
+			var month = reportDateArray[1];
+			var year = reportDateArray[0];
 
-		var month = reportDateArray[1];
-		var year = reportDateArray[0];
+		} else {
+			var month = null;
+			var year = null;
+
+		}
 
 		var finalReport = $("#finalReport").prop('checked');
 		var aeeApproval = $("#aeeApproval").prop('checked');
@@ -66,23 +71,38 @@
 		// 				.done(function() {})
 		// 				.fail(function(data, status, er) {alert("Couldn't load location information !" + data + er);});
 		// 			}
+		var oilReportFilterModel = {
+			selectedCircle : circleSelected,
+			selectedDivision : divisionSelected,
+			selectedSubstation : substationSelected,
+
+			sampleNo : sampleNo,
+			startDate : null,
+			endDate : null,
+			reportMonth : month,
+			reportYear : year,
+			finalReport : finalReport,
+			aeeApproval : aeeApproval,
+			rejectedReport : rejectedReport
+
+		};
+
 		$.ajax({
 			url : "/ODTL/filterOilReport",
 			type : "POST",
 			data : {
-				circleSelected : circleSelected,
-				divisionSelected : divisionSelected,
-				substationSelected : substationSelected,
+				selectedCircle : circleSelected,
+				selectedDivision : divisionSelected,
+				selectedSubstation : substationSelected,
 
 				sampleNo : sampleNo,
-				reportDateStart : null,
-				reportDateEnd : null,
-				month : month,
-				year : year,
+				startDate : null,
+				endDate : null,
+				reportMonth : month,
+				reportYear : year,
 				finalReport : finalReport,
 				aeeApproval : aeeApproval,
 				rejectedReport : rejectedReport
-
 			},
 			success : function(response) {
 				$("#tableContainer").replaceWith(response);
@@ -92,7 +112,7 @@
 
 			},
 			error : function(data, status, er) {
-				//alert("Error" + data + er);
+				alert("Error" + data + er);
 			}
 		});
 
@@ -120,19 +140,21 @@
 </script>
 
 <script type="text/javascript">
-var customModal;
-customModal = customModal || (function () {
-    var pleaseWaitDiv = $('<div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-header"><h1>Processing...</h1></div><div class="modal-body"><div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div></div></div>');
-    return {
-        showPleaseWait: function() {
-            pleaseWaitDiv.modal();
-        },
-        hidePleaseWait: function () {
-            pleaseWaitDiv.modal('hide');
-        },
+	var customModal;
+	customModal = customModal
+			|| (function() {
+				var pleaseWaitDiv = $('<div class="modal hide" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="modal-header"><h1>Processing...</h1></div><div class="modal-body"><div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div></div></div>');
+				return {
+					showPleaseWait : function() {
+						pleaseWaitDiv.modal();
+					},
+					hidePleaseWait : function() {
+						pleaseWaitDiv.modal('hide');
+					},
 
-    };
-})();</script>
+				};
+			})();
+</script>
 
 <div id="accordion">
 	<div class="card-header">
