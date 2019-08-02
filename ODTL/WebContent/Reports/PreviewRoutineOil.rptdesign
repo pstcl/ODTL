@@ -4382,11 +4382,11 @@ WHERE
                     </text>
                     <text id="647">
                         <property name="contentType">auto</property>
-                        <text-property name="content"><![CDATA[0.2 (>170 KV)]]></text-property>
+                        <text-property name="content"><![CDATA[0.2 (>=170 KV)]]></text-property>
                     </text>
                     <text id="1293">
                         <property name="contentType">auto</property>
-                        <text-property name="content"><![CDATA[0.1 (<170 KV)]]></text-property>
+                        <text-property name="content"><![CDATA[1.0 (<170 KV)]]></text-property>
                     </text>
                 </cell>
                 <cell id="1038">
@@ -4399,11 +4399,11 @@ WHERE
                     </text>
                     <text id="1295">
                         <property name="contentType">auto</property>
-                        <text-property name="content"><![CDATA[0.015 (>170 KV)]]></text-property>
+                        <text-property name="content"><![CDATA[0.015 (<170 KV)]]></text-property>
                     </text>
                     <text id="1296">
                         <property name="contentType">auto</property>
-                        <text-property name="content"><![CDATA[0.01 (<170 KV)]]></text-property>
+                        <text-property name="content"><![CDATA[0.01 (>=170 KV)]]></text-property>
                     </text>
                 </cell>
                 <cell id="1241">
